@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+class Task {
+  String name;
+  bool isCompleted;
+
+  Task({required this.name, this.isCompleted = false});
+}
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -24,13 +31,13 @@ class TaskListScreen extends StatefulWidget {
 
 class _TaskListScreenState extends State<TaskListScreen> {
   final TextEditingController _controller = TextEditingController();
-  final List<String> _tasks = [];
+  final List<Task> _tasks = [];
 
   void _addTask() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     setState(() {
-      _tasks.add(text);
+      _tasks.add(Task(name: text)); // create a new Task
       _controller.clear();
     });
   }
@@ -63,7 +70,30 @@ class _TaskListScreenState extends State<TaskListScreen> {
             child: ListView.builder(
               itemCount: _tasks.length,
               itemBuilder: (context, index) {
-                return ListTile(title: Text(_tasks[index]));
+                return ListTile(
+                  leading: Checkbox(
+                    value: _tasks[index].isCompleted,
+                    onChanged: (_) {
+                      setState(() {
+                        _tasks[index].isCompleted = !_tasks[index].isCompleted;
+                      });
+                    },
+                  ),
+                  title: Text(
+                    _tasks[index].name,
+                    style: TextStyle(
+                      decoration: _tasks[index].isCompleted
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
+                    ),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      setState(() => _tasks.removeAt(index));
+                    },
+                  ),
+                );
               },
             ),
           ),
